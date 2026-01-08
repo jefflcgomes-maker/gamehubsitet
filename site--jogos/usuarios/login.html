@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | GameHub Indie</title>
+
+  <!-- CSS global do site -->
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <!-- Estilo FUTURISTA apenas do login (não afeta o resto do site) -->
+  <style>
+    body.auth-page{
+      min-height: 100vh;
+      background: radial-gradient(900px 500px at 20% 10%, rgba(124,92,255,.22), transparent 60%),
+                  radial-gradient(900px 500px at 80% 90%, rgba(76,175,80,.18), transparent 60%),
+                  #0b0f17;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Fundo com grid neon */
+    .neo-bg{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .35;
+      background-image:
+        linear-gradient(rgba(106,166,255,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,166,255,.10) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1), rgba(0,0,0,.1) 60%, transparent 75%);
+    }
+
+    /* “Glow” */
+    .glow{
+      position: fixed;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      filter: blur(50px);
+      opacity: .25;
+      pointer-events: none;
+      background: conic-gradient(from 180deg, #7c5cff, #6aa6ff, #4caf50, #7c5cff);
+      top: -220px;
+      left: -220px;
+      animation: floaty 8s ease-in-out infinite;
+    }
+    @keyframes floaty{
+      0%,100%{ transform: translate(0,0) rotate(0deg); }
+      50%{ transform: translate(60px, 40px) rotate(18deg); }
+    }
+
+    /* Container */
+    .auth-wrap{
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+      padding: 30px 16px 50px;
+    }
+
+    /* Card glass */
+    .auth-card{
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 22px 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-card:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(76,175,80,.20), rgba(106,166,255,.20));
+      opacity: .35;
+      filter: blur(20px);
+      z-index: 0;
+    }
+    .auth-card > *{ position: relative; z-index: 1; }
+
+    .brand h1{
+      font-size: 18px;
+      letter-spacing: .6px;
+      margin-bottom: 4px;
+    }
+    .brand p{
+      font-size: 13px;
+      opacity: .85;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .field{
+      display: block;
+      margin-bottom: 12px;
+    }
+    .field span{
+      display:block;
+      font-size: 12px;
+      opacity: .85;
+      margin-bottom: 6px;
+    }
+
+    /* Inputs com visual neon */
+    .field input{
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: #fff;
+      padding: 12px 12px;
+      border-radius: 10px;
+      outline: none;
+      transition: .18s ease;
+    }
+    .field input::placeholder{ color: rgba(255,255,255,.55); }
+    .field input:focus{
+      border-color: rgba(106,166,255,.65);
+      box-shadow: 0 0 0 3px rgba(106,166,255,.18);
+    }
+
+    .password-row{
+      display:flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .toggle{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: #fff;
+      padding: 12px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .18s ease;
+      min-width: 48px;
+    }
+    .toggle:hover{
+      border-color: rgba(124,92,255,.55);
+      box-shadow: 0 0 0 3px rgba(124,92,255,.14);
+    }
+
+    .row{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      margin: 10px 0 14px;
+      font-size: 12px;
+      opacity: .92;
+    }
+    .check{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .check input{ accent-color: #4caf50; }
+
+    .link{
+      color: #6aa6ff;
+      text-decoration: none;
+    }
+    .link:hover{ text-decoration: underline; }
+
+    /* Botão usando seu verde, mas com “neon” */
+    .btn-login{
+      width: 100%;
+      border: none;
+      background: linear-gradient(90deg, #4caf50, #6aa6ff);
+      color: #000;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn-login:hover{ filter: brightness(1.05); }
+    .btn-login:active{ transform: scale(.99); }
+
+    .error{
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-top: 6px;
+      min-height: 16px;
+      display:block;
+    }
+
+    .muted{
+      margin-top: 12px;
+      font-size: 13px;
+      opacity: .85;
+      text-align:center;
+    }
+
+    /* Footer */
+    .auth-footer{
+      text-align:center;
+      padding: 10px 16px 22px;
+      font-size: 13px;
+      opacity: .85;
+    }
+
+    /* Ajuste mobile */
+    @media (max-width: 420px){
+      .auth-card{ padding: 18px 14px; border-radius: 14px; }
+    }
+  </style>
+</head>
+
+<body class="auth-page">
+
+  <div class="neo-bg"></div>
+  <div class="glow"></div>
+
+  <!-- Header padrão do site -->
+  <header>
+    <h2>GameHub Indie</h2>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../catalogo.html">Jogos</a>      <a href="../sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <main class="auth-wrap">
+    <section class="auth-card">
+      <div class="brand">
+        <h1>Área do Jogador</h1>
+        <p>Entre para salvar progresso, favoritos e acessar sua conta.</p>
+      </div>
+
+      <form id="loginForm" autocomplete="on" novalidate>
+        <label class="field">
+          <span>Email</span>
+          <input id="email" type="email" placeholder="seuemail@gmail.com" autocomplete="email" />
+          <small class="error" id="emailError"></small>
+        </label>
+
+        <label class="field">
+          <span>Senha</span>
+          <div class="password-row">
+            <input id="senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
+            <button type="button" class="toggle" id="toggleSenha" title="Mostrar/ocultar senha">👁</button>
+          </div>
+          <small class="error" id="senhaError"></small>
+        </label>
+
+        <div class="row">
+          <label class="check">
+            <input id="lembrar" type="checkbox" />
+            <span>Lembrar</span>
+          </label>
+
+          <a class="link" href="#" id="forgotLink">Esqueci a senha</a>
+        </div>
+
+        <button class="btn-login" type="submit">Entrar</button>
+
+        <p class="muted">
+          Não tem conta?
+          <a class="link" href="./cadastro.html">Cadastre-se</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="auth-footer">
+    <a class="link" href="../index.html">← Voltar para Home</a>
+  </footer>
+
+  <!-- JS do login (sem depender de arquivo externo) -->
+  <script type="module">
+  import { Auth } from "./auth.js";
+  import { consumeRedirect } from "/js/access.js";
+
+  const form = document.getElementById("loginForm");
+  const email = document.getElementById("email");
+  const senha = document.getElementById("senha");
+  const emailError = document.getElementById("emailError");
+  const senhaError = document.getElementById("senhaError");
+  const toggleSenha = document.getElementById("toggleSenha");
+  const lembrar = document.getElementById("lembrar");
+
+  // Mantém o email salvo
+  const saved = Auth.getSavedEmail();
+  if (saved) email.value = saved;
+
+  toggleSenha?.addEventListener("click", () => {
+    senha.type = (senha.type === "password") ? "text" : "password";
+  });
+
+  function clearErrors(){
+    emailError.textContent = "";
+    senhaError.textContent = "";
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const eVal = email.value.trim();
+    const sVal = senha.value.trim();
+
+    if (!eVal) {
+      emailError.textContent = "Digite seu email.";
+      return;
+    }
+    if (!sVal) {
+      senhaError.textContent = "Digite sua senha.";
+      return;
+    }
+
+    const result = Auth.login(eVal, sVal);
+
+    if (!result.ok) {
+      senhaError.textContent = result.message;
+      return;
+    }
+
+    if (lembrar?.checked) Auth.saveEmail(eVal);
+    else Auth.clearSavedEmail();
+
+    const backTo = consumeRedirect();
+    window.location.href = backTo || "./usuario.html";
+  });
+</script>
+
+  <!-- MENU INTELIGENTE -->
+  <script type="module" src="/js/menu-auth.js"></script>
+
+  <script type="module" src="/js/menu-auth.js"></script>
+  <script type="module" src="/js/access.js"></script>
+</body>
+</html>

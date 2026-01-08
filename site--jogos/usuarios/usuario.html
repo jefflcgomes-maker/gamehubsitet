@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área do Usuário | GameHub Indie</title>
+
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <style>
+    body.user-page{
+      min-height: 100vh;
+      background: radial-gradient(900px 500px at 20% 10%, rgba(124,92,255,.18), transparent 60%),
+                  radial-gradient(900px 500px at 80% 90%, rgba(76,175,80,.14), transparent 60%),
+                  #0b0f17;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .neo-bg{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .30;
+      background-image:
+        linear-gradient(rgba(106,166,255,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,166,255,.10) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1), rgba(0,0,0,.15) 60%, transparent 75%);
+    }
+
+    .wrap{
+      min-height: calc(100vh - 80px);
+      display: grid;
+      place-items: center;
+      padding: 30px 16px 40px;
+    }
+
+    .card{
+      width: 100%;
+      max-width: 620px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+
+    .title{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title h1{
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .top-actions{
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn{
+      border: none;
+      background: linear-gradient(90deg, #4caf50, #6aa6ff);
+      color: #000;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn.secondary{
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .btn[aria-disabled="true"]{
+      opacity: .6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .meta{
+      opacity: .92;
+      line-height: 1.6;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .actions{
+      margin-top: 16px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .link{
+      color: #6aa6ff;
+      text-decoration: none;
+    }
+    .link:hover{ text-decoration: underline; }
+
+    .status{
+      margin-top: 12px;
+      font-size: 13px;
+      opacity: .9;
+      border-left: 3px solid rgba(106,166,255,.6);
+      padding-left: 10px;
+    }
+    .status strong{ color: #6aa6ff; }
+  </style>
+</head>
+
+<body class="user-page">
+  <div class="neo-bg"></div>
+
+  <header>
+    <h2>GameHub Indie</h2>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../catalogo.html">Jogos</a>
+      <a href="../sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="title">
+        <h1>Área do Usuário</h1>
+
+        <div class="top-actions">
+          <!-- Botão DEV muda conforme status -->
+          <a id="devAction" class="btn secondary" href="./dev-formulario.html">Virar um dev</a>
+          <button class="btn" id="logoutBtn">Sair</button>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div><strong>Nome:</strong> <span id="nomeTxt">...</span></div>
+        <div><strong>Nick:</strong> <span id="nickTxt">...</span></div>
+        <div><strong>Email:</strong> <span id="emailTxt">...</span></div>
+      </div>
+
+      <div class="status" id="devStatusBox" style="display:none;"></div>
+
+      <div class="actions">
+        <a class="link" href="../index.html">← Voltar ao site</a>
+        <small style="opacity:.75">* DEMO: dados ficam no navegador</small>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { Auth } from "./auth.js";
+
+    // Proteção: se não estiver logado, volta pro login
+    if (!Auth.isLoggedIn()) {
+      window.location.href = "./login.html";
+    }
+
+    const user = Auth.getCurrentUser();
+    if (!user) {
+      Auth.logout();
+      window.location.href = "./login.html";
+    }
+
+    document.getElementById("nomeTxt").textContent = user.nome || "-";
+    document.getElementById("nickTxt").textContent = user.nick || "-";
+    document.getElementById("emailTxt").textContent = user.email || "-";
+
+    // ===== DEV BUTTON LOGIC =====
+    const devAction = document.getElementById("devAction");
+    const box = document.getElementById("devStatusBox");
+
+    function setStatus(html){
+      box.style.display = "block";
+      box.innerHTML = html;
+    }
+
+    function isoToBR(iso){
+      try{
+        const d = new Date(iso);
+        return d.toLocaleDateString("pt-BR");
+      }catch{ return ""; }
+    }
+
+    const now = Date.now();
+    const rejectedUntil = user.devRejectedUntil ? new Date(user.devRejectedUntil).getTime() : 0;
+
+    // Se aprovado
+    if (user.isDev === true || user.devStatus === "approved") {
+      devAction.textContent = "Página do Dev";
+      devAction.classList.remove("secondary");
+      devAction.classList.add("btn");
+      devAction.href = "/dev/painel-dev.html";
+      setStatus("<strong>Status DEV:</strong> Aprovado ✅");
+    }
+    // Se pendente
+    else if (user.devStatus === "pending") {
+      devAction.textContent = "Aguardando ser aceito";
+      devAction.setAttribute("aria-disabled", "true");
+      devAction.href = "#";
+      setStatus("<strong>Status DEV:</strong> Em análise ⏳ (aguarde aprovação)");
+    }
+    // Se rejeitado e ainda em cooldown
+    else if (user.devStatus === "rejected" && rejectedUntil && now < rejectedUntil) {
+      devAction.textContent = "Recusado (aguarde 7 dias)";
+      devAction.setAttribute("aria-disabled", "true");
+      devAction.href = "#";
+      setStatus("<strong>Status DEV:</strong> Recusado ❌. Tente novamente após <strong>" + isoToBR(user.devRejectedUntil) + "</strong>.");
+    }
+    // Caso contrário: pode pedir dev
+    else {
+      devAction.textContent = "Virar um dev";
+      devAction.removeAttribute("aria-disabled");
+      devAction.href = "./dev-formulario.html";
+      setStatus("<strong>Status DEV:</strong> Não solicitado. Envie seu formulário para virar dev.");
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      Auth.logout();
+      window.location.href = "./login.html";
+    });
+  </script>
+
+  <!-- MENU + CONTROLE DE ACESSO -->
+  <script type="module" src="/js/menu-auth.js"></script>
+  <script type="module" src="/js/access.js"></script>
+</body>
+</html>

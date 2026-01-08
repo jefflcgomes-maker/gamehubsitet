@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categoria | GameHub Indie</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<header>
+  <h2>GameHub Indie</h2>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="catalogo.html">Jogos</a>
+    <a href="sobre.html">Sobre</a>
+  </nav>
+</header>
+
+
+<div class="container">
+  <h1 id="catTitle">Categoria</h1>
+  <div class="grid" id="grid"></div>
+  <p id="empty" style="opacity:.85; display:none;">Nenhum jogo encontrado nesta categoria (DEMO).</p>
+</div>
+
+<script type="module">
+  import { DevSystem } from "/js/dev-system.js";
+
+  const params = new URLSearchParams(window.location.search);
+  const cat = (params.get("cat") || "").toLowerCase();
+
+  const titleMap = {
+    "acao":"Ação","rpg":"RPG","terror":"Terror","aventura":"Aventura","puzzle":"Puzzle","outros":"Outros"
+  };
+  const label = titleMap[cat] || "Categoria";
+
+  document.getElementById("catTitle").textContent = "Categoria: " + label;
+
+  const games = DevSystem.getPublishedGames().filter(g => (g.category||"").toLowerCase() === label.toLowerCase());
+  const grid = document.getElementById("grid");
+
+  if (!games.length) {
+    document.getElementById("empty").style.display = "block";
+  } else {
+    grid.innerHTML = games.map(g => `
+      <div class="card">
+        <img src="${g.coverUrl || 'assets/img/jogo1.jpg'}" alt="Capa">
+        <div class="card-content">
+          <h3>${g.title}</h3>
+          <p class="categoria">${g.category || 'Indie'}</p>
+          <a href="${g.downloadUrl}" target="_blank" rel="noreferrer" class="btn">Download</a>
+        </div>
+      </div>
+    `).join("");
+  }
+</script>
+
+<footer>© 2026 GameHub Indie</footer>
+
+<!-- MENU + CONTROLE DE ACESSO -->
+<script type="module" src="/js/menu-auth.js"></script>
+<script type="module" src="/js/access.js"></script>
+</body>
+</html>
+
