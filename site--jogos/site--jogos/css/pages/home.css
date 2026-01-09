@@ -1,0 +1,389 @@
+/* =========================
+   TARJA 1 (vidro azul) atrás do menu
+   Ajuste manual aqui ↓
+========================= */
+:root{
+  /* cor do vidro azul (transparente) */
+  --strip-bg: rgba(12, 19, 48, 0.705);
+
+  /* controles */
+  --strip-height: auto;         /* ex: 60px ou auto */
+  --strip-padding-y: 12px;      /* altura extra acima/abaixo dos botões */
+  --strip-padding-x: 0px;       /* “engordar” laterais */
+  --strip-radius: 0px;          /* 0 reta | ex 14px arredondada */
+  --strip-offset-y: 0px;        /* sobe/desce: ex -6px / 10px */
+
+  /* efeito vidro */
+  --strip-blur: 14px; 
+  --strip-border: rgb(34, 166, 255, 0.925);
+  --strip-glow: 0 0 22px rgba(34, 166, 255, 0.925);
+}
+
+/* a tarja em si */
+.menu-strip{
+  background: var(--strip-bg);
+  height: var(--strip-height);
+
+  padding: var(--strip-padding-y) var(--strip-padding-x);
+  border-radius: var(--strip-radius);
+
+  /* ponta a ponta REAL */
+  width: 120vw;
+  margin-left: calc(50% - 50vw);
+
+  /* ajuste vertical */
+  transform: translateY(var(--strip-offset-y));
+
+  /* EFEITO VIDRO */
+  backdrop-filter: blur(var(--strip-blur));
+  -webkit-backdrop-filter: blur(var(--strip-blur));
+
+  border-top: 2px solid var(--strip-border);
+  border-bottom: 2px solid var(--strip-border);
+
+  box-shadow: var(--strip-glow), inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* garante que o menu continue centralizado dentro da tarja */
+.menu-strip nav{
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* botões em cima do vidro */
+.menu-strip nav a{
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  /* botão mais escuro em cima do vidro */
+  background: rgba(42, 71, 150, 0.55);
+  border: 2px solid rgba(34,166,255,0.55);
+
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.menu-strip nav a:hover{
+  transform: translateY(-1px);
+  background: rgba(43,107,255,0.22);
+  border-color: rgba(255,255,255,0.24);
+}
+
+/* opcional: destaque do ENTRA */
+.menu-strip nav a.btn-entrar{
+  background: rgba(43,107,255,0.28);
+  border-color: rgba(43,107,255,0.55);
+}
+
+
+/* =========================
+   TARJA 2 AZUL FULL WIDTH (ponta a ponta)
+   Ajuste manual aqui ↓
+========================= */
+:root{
+  /* tamanho e posição da tarja */
+  --hero-height: auto;          /* ou: 180px */
+  --hero-padding-y: 40px;       /* aumenta/abaixa a tarja */
+  --hero-offset-y: -10px;         /* sobe/desce a tarja */
+
+  /* cor e efeitos */
+  --hero-bg: rgba(12, 19, 48, 0.705);   /* azul translúcido */
+  --hero-border: rgba(34, 166, 255, 0.925);
+  --hero-glow: 0 0 22px rgba(4, 166, 255, 0.925);
+
+  /* imagem opcional (deixe none por enquanto) */
+  --hero-bg-image: none;        /* depois: url("assets/img/banner.jpg") */
+}
+
+/* tarja full width real */
+.hero-banner.full-bleed{
+  width: 100vw;                         /* pega a tela toda */
+  margin-left: calc(50% - 50vw);        /* “estica” mesmo dentro do container */
+
+  height: var(--hero-height);
+  padding: var(--hero-padding-y) 0;
+
+  transform: translateY(var(--hero-offset-y));
+
+  background-color: var(--hero-bg);
+  background-image: var(--hero-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border-top: 2px solid var(--hero-border);
+  border-bottom: 2px solid var(--hero-border);
+  box-shadow: var(--hero-glow);
+
+  position: relative;
+}
+
+/* “miolo” do texto alinhado como o container */
+.hero-banner .hero-inner{
+  max-width: 1100px;     /* você pode ajustar */
+  margin: 0 auto;
+  padding: 0 20px;       /* distância das bordas */
+  text-align: center;
+}
+
+.hero-banner h1{
+  margin: 0;
+  font-size: 44px;
+}
+
+.hero-banner p{
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+:root{
+  /* === TÍTULO (GameHub) === */
+  --title-size: 50px;
+  --title-x: 0px;   /* esquerda/direita */
+  --title-y: 0px;   /* cima/baixo */
+  --title-weight: 900;
+  --title-spacing: 1px;
+
+  /* === SUBTÍTULO (frase) === */
+  --sub-size: 16px;
+  --sub-x: 0px;
+  --sub-y: 0px;
+  --sub-weight: 500;
+  --sub-opacity: 0.90;
+  --sub-spacing: 0.8px;
+}
+
+
+/* =========================
+   CONTROLE DO TÍTULO E TEXTO (separados)
+   Mexa só nas variáveis ↓
+========================= */
+:root{
+  /* === TÍTULO (GameHub) === */
+  --title-size: 65px;
+  --title-x: -300px;
+  --title-y: 0px;
+  --title-weight: 900;
+  --title-spacing: 1px;
+  --title-color: #ffffff;
+  --title-font: "Arial Black", Arial, sans-serif;   /* pode trocar */
+  --title-shadow: 0 0 18px rgba(0, 0, 0, 0.692);
+
+  /* === SUBTÍTULO (frase) === */
+  --sub-size: 20px;
+  --sub-x: -190px;
+  --sub-y: 0px;
+  --sub-weight: 500;
+  --sub-spacing: 0.6px;
+  --sub-opacity: 0.90;
+  --sub-color: rgb(255, 255, 255);
+  --sub-font: "Trebuchet MS", Arial, sans-serif;     /* pode trocar */
+  --sub-shadow: none;
+
+  /* alinhamento: center | left | right */
+  --hero-text-align: center;
+}
+
+/* ALTERA TARJA DO TITULO */
+.hero-title{
+  margin: 0 !important;
+  font-size: var(--title-size) !important;
+  font-weight: var(--title-weight) !important;
+  letter-spacing: var(--title-spacing) !important;
+  color: var(--title-color) !important;
+  font-family: var(--title-font) !important;
+  text-shadow: var(--title-shadow) !important;
+
+  transform: translate(var(--title-x), var(--title-y)) !important;
+  text-align: var(--hero-text-align) !important;
+}
+
+.hero-subtitle{
+  margin-top: 10px !important;
+  font-size: var(--sub-size) !important;
+  font-weight: var(--sub-weight) !important;
+  letter-spacing: var(--sub-spacing) !important;
+  opacity: var(--sub-opacity) !important;
+  color: var(--sub-color) !important;
+  font-family: var(--sub-font) !important;
+  text-shadow: var(--sub-shadow) !important;
+
+  transform: translate(var(--sub-x), var(--sub-y)) !important;
+  text-align: var(--hero-text-align) !important;
+}
+
+
+/* =========================
+   TARJA NOVIDADES (full width + vidro azul)
+========================= */
+:root{
+  --strip-bg2: rgba(12, 19, 48, 0.70);
+  --strip-blur2: 14px;
+  --strip-border2: rgba(34,166,255,0.55);
+  --strip-glow2: 0 0 22px rgba(34,166,255,0.28);
+
+  --strip-pad-y2: 20px;
+  --strip-offset-y2: 20px;
+
+  --inner-max2: 1250px;
+  --inner-pad-x2: 0px;
+
+  --card-w2: 300px;
+  --card-h2: 300px;
+  --card-radius2: 12px;
+}
+
+.cards-strip.full-bleed{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+
+  padding: var(--strip-pad-y2) 0;
+  transform: translateY(var(--strip-offset-y2));
+
+  background: var(--strip-bg2);
+  backdrop-filter: blur(var(--strip-blur2));
+  -webkit-backdrop-filter: blur(var(--strip-blur2));
+
+  border-top: 2px solid var(--strip-border2);
+  border-bottom: 2px solid var(--strip-border2);
+
+  box-shadow: var(--strip-glow2), inset 0 0 0 0px rgba(255,255,255,0.06);
+}
+
+.cards-strip-inner{
+  max-width: var(--inner-max2);
+  margin: 0 auto;
+  padding: 0 var(--inner-pad-x2);
+}
+
+/* Cabeçalho: título + botões */
+.strip-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.cards-strip-title{
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgb(255, 255, 255);
+}
+
+.strip-actions{
+  display: flex;
+  gap: 20px;
+}
+
+.strip-btn{
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  background: rgba(34,166,255,0.12);
+  border: 1.5px solid rgba(34,166,255,0.35);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.strip-btn:hover{
+  background: rgba(34,166,255,0.20);
+  border-color: rgba(34,166,255,0.60);
+}
+
+/* Galeria horizontal */
+.strip-cards{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--card-w2);
+  gap: 14px;
+
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+.strip-cards::-webkit-scrollbar{ height: 10px; }
+.strip-cards::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.14);
+  border-radius: 999px;
+}
+
+/* Card */
+.strip-card{
+  width: var(--card-w2);
+  height: var(--card-h2);
+  border-radius: var(--card-radius2);
+  display: block;
+  text-decoration: none;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+
+  background: rgba(0,0,0,0.25);
+  border: 2px solid rgba(34,166,255,0.55);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.strip-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(34,166,255,0.70);
+  box-shadow: 0 0 18px rgba(34,166,255,0.18), inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* Thumb do jogo */
+.strip-card img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Overlay com nome do jogo */
+.strip-card .label{
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile */
+@media (max-width: 720px){
+  :root{ --card-w2: 190px; --card-h2: 125px; }
+}
+
+/* Texto no centro do card placeholder */
+.strip-card-placeholder .placeholder-center{
+  position: absolute;
+  inset: 0;                 /* ocupa o card todo */
+  display: flex;
+  align-items: center;      /* centro vertical */
+  justify-content: center;  /* centro horizontal */
+
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.92);
+  text-transform: uppercase;
+
+  pointer-events: none;     /* não atrapalha clique */
+}
