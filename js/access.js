@@ -1,5 +1,5 @@
 // js/access.js
-import { Auth } from "/usuarios/auth.js";
+import { Auth } from "../usuarios/auth.js";
 
 const REDIRECT_KEY = "gh_redirect_after_login_v1";
 const ADMIN_OK_KEY = "gh_admin_ok_v1";
