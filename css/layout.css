@@ -120,3 +120,48 @@ footer {
   font-size: 13px;
   color: #888;
 }
+
+/* =========================================
+   MENU / TOPBAR (EDIÇÃO RÁPIDA)
+   (não muda o visual agora; só facilita editar depois)
+========================================= */
+:root{
+  --topbar-bg: rgba(20, 20, 20, 0.85);
+  --topbar-blur: 10px;
+
+  --menu-gap: 18px;
+
+  --btn-font: 15px;
+  --btn-pad-y: 8px;
+  --btn-pad-x: 14px;
+  --btn-radius: 6px;
+
+  --btn-bg: rgba(42, 71, 150, 0.55);
+  --btn-border: rgb(34,166,255,0.55);
+
+  --btn-bg-hover: rgba(27, 128, 187, 0.28);
+  --btn-border-hover: rgba(70, 130, 255, 0.75);
+}
+
+.menu-strip{
+  background: var(--topbar-bg);
+  backdrop-filter: blur(var(--topbar-blur));
+  -webkit-backdrop-filter: blur(var(--topbar-blur));
+}
+
+header nav{
+  gap: var(--menu-gap);
+}
+
+header nav a{
+  font-size: var(--btn-font);
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border-radius: var(--btn-radius);
+  background: var(--btn-bg);
+  border: 2px solid var(--btn-border);
+}
+
+header nav a:hover{
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+}
