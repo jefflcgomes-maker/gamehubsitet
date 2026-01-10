@@ -173,12 +173,14 @@
     // Proteção: se não estiver logado, volta pro login
     if (!Auth.isLoggedIn()) {
       window.location.href = "./login.html";
+      return;
     }
 
     const user = Auth.getCurrentUser();
     if (!user) {
       Auth.logout();
       window.location.href = "./login.html";
+      return;
     }
 
     document.getElementById("nomeTxt").textContent = user.nome || "-";
@@ -209,7 +211,7 @@
       devAction.textContent = "Página do Dev";
       devAction.classList.remove("secondary");
       devAction.classList.add("btn");
-      devAction.href = "/dev/painel-dev.html";
+      devAction.href = "../dev/painel-dev.html";
       setStatus("<strong>Status DEV:</strong> Aprovado ✅");
     }
     // Se pendente

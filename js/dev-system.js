@@ -1,5 +1,5 @@
 // js/dev-system.js
-import { Auth } from "/..usuarios/auth.js";
+import { Auth } from "../usuarios/auth.js";
 
 const DEV_APPS_KEY = "gh_dev_apps_v1";
 const GAME_SUBS_KEY = "gh_game_submissions_v1";
@@ -39,6 +39,34 @@ function addDaysISO(days) {
   return d.toISOString();
 }
 
+// ✅ Normaliza categorias para evitar “Ação” vs “acao” vs “AÇÃO”
+function normalizeCategory(cat) {
+  const s = String(cat || "").trim().toLowerCase();
+
+  const map = {
+    "acao": "Ação",
+    "ação": "Ação",
+    "rpg": "RPG",
+    "terror": "Terror",
+    "aventura": "Aventura",
+    "puzzle": "Puzzle",
+    "outros": "Outros",
+    "indie": "Indie",
+  };
+
+  return map[s] || (s ? (s[0].toUpperCase() + s.slice(1)) : "");
+}
+
+// ✅ Valida URL (pra não salvar “drive.com/...” sem https)
+function isValidHttpUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const DevSystem = {
   // ===== DEV APPLICATIONS =====
   getDevApps() {
@@ -50,7 +78,10 @@ export const DevSystem = {
   },
 
   getDevAppByUserId(userId) {
-    return this.getDevApps().find(a => a.userId === userId && (a.status === "pending" || a.status === "approved" || a.status === "rejected")) || null;
+    return this.getDevApps().find(a =>
+      a.userId === userId &&
+      (a.status === "pending" || a.status === "approved" || a.status === "rejected")
+    ) || null;
   },
 
   submitDevApplication(formData) {
@@ -80,13 +111,18 @@ export const DevSystem = {
       nome: user.nome,
       nick: user.nick,
       email: user.email,
-      ...formData,
+
+      tipo: String(formData?.tipo || "solo"),
+      portfolio: String(formData?.portfolio || "").trim(),
+      motivo: String(formData?.motivo || "").trim(),
+
       status: "pending",
       createdAt: nowISO(),
       decidedAt: null,
       decidedBy: "admin",
       rejectReason: null
     };
+
     apps.push(app);
     writeArray(DEV_APPS_KEY, apps);
 
@@ -116,7 +152,6 @@ export const DevSystem = {
       apps[idx] = app;
       writeArray(DEV_APPS_KEY, apps);
 
-      // atualiza usuário
       Auth.updateUserById(app.userId, {
         devStatus: "approved",
         isDev: true,
@@ -169,7 +204,11 @@ export const DevSystem = {
 
     if (title.length < 2) return { ok: false, message: "Título inválido." };
     if (description.length < 10) return { ok: false, message: "Descrição muito curta (mín. 10)." };
+
     if (!downloadUrl) return { ok: false, message: "Coloque um link de download (Drive/Itch/etc.)." };
+    if (!isValidHttpUrl(downloadUrl)) {
+      return { ok: false, message: "Link de download inválido. Use um link completo com https://..." };
+    }
 
     const subs = this.getSubmissions();
     const sub = {
@@ -180,7 +219,7 @@ export const DevSystem = {
 
       title,
       description,
-      category: String(payload?.category || "").trim(),
+      category: normalizeCategory(payload?.category),
       tags: String(payload?.tags || "").trim(),
       coverUrl: String(payload?.coverUrl || "").trim(),
       galleryUrls: String(payload?.galleryUrls || "").trim(),

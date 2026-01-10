@@ -21,7 +21,6 @@
       overflow-x: hidden;
     }
 
-    /* Fundo com grid neon */
     .neo-bg{
       position: fixed;
       inset: 0;
@@ -34,7 +33,6 @@
       mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1), rgba(0,0,0,.1) 60%, transparent 75%);
     }
 
-    /* “Glow” */
     .glow{
       position: fixed;
       width: 700px;
@@ -53,7 +51,6 @@
       50%{ transform: translate(60px, 40px) rotate(18deg); }
     }
 
-    /* Container */
     .auth-wrap{
       min-height: calc(100vh - 80px);
       display: grid;
@@ -61,7 +58,6 @@
       padding: 30px 16px 50px;
     }
 
-    /* Card glass */
     .auth-card{
       width: 100%;
       max-width: 420px;
@@ -97,10 +93,7 @@
       line-height: 1.4;
     }
 
-    .field{
-      display: block;
-      margin-bottom: 12px;
-    }
+    .field{ display:block; margin-bottom: 12px; }
     .field span{
       display:block;
       font-size: 12px;
@@ -108,7 +101,6 @@
       margin-bottom: 6px;
     }
 
-    /* Inputs com visual neon */
     .field input{
       width: 100%;
       border: 1px solid rgba(255,255,255,.14);
@@ -128,7 +120,7 @@
     .password-row{
       display:flex;
       gap: 8px;
-      align-items: center;
+      align-items:center;
     }
     .toggle{
       border: 1px solid rgba(255,255,255,.14);
@@ -169,7 +161,6 @@
     }
     .link:hover{ text-decoration: underline; }
 
-    /* Botão usando seu verde, mas com “neon” */
     .btn-login{
       width: 100%;
       border: none;
@@ -199,7 +190,6 @@
       text-align:center;
     }
 
-    /* Footer */
     .auth-footer{
       text-align:center;
       padding: 10px 16px 22px;
@@ -207,7 +197,6 @@
       opacity: .85;
     }
 
-    /* Ajuste mobile */
     @media (max-width: 420px){
       .auth-card{ padding: 18px 14px; border-radius: 14px; }
     }
@@ -215,16 +204,15 @@
 </head>
 
 <body class="auth-page">
-
   <div class="neo-bg"></div>
   <div class="glow"></div>
 
-  <!-- Header padrão do site -->
   <header>
     <h2>GameHub Indie</h2>
     <nav>
       <a href="../index.html">Home</a>
-      <a href="../catalogo.html">Jogos</a>      <a href="../sobre.html">Sobre</a>
+      <a href="../catalogo.html">Jogos</a>
+      <a href="../sobre.html">Sobre</a>
     </nav>
   </header>
 
@@ -257,7 +245,7 @@
             <span>Lembrar</span>
           </label>
 
-          <a class="link" href="#" id="forgotLink">Esqueci a senha</a>
+          <a class="link" href="./esqueci.html" id="forgotLink">Esqueci a senha</a>
         </div>
 
         <button class="btn-login" type="submit">Entrar</button>
@@ -274,66 +262,59 @@
     <a class="link" href="../index.html">← Voltar para Home</a>
   </footer>
 
-  <!-- JS do login (sem depender de arquivo externo) -->
   <script type="module">
-  import { Auth } from "./auth.js";
-  import { consumeRedirect } from "/js/access.js";
+    import { Auth } from "./auth.js";
+    import { consumeRedirect } from "../js/access.js";
 
-  const form = document.getElementById("loginForm");
-  const email = document.getElementById("email");
-  const senha = document.getElementById("senha");
-  const emailError = document.getElementById("emailError");
-  const senhaError = document.getElementById("senhaError");
-  const toggleSenha = document.getElementById("toggleSenha");
-  const lembrar = document.getElementById("lembrar");
+    const form = document.getElementById("loginForm");
+    const email = document.getElementById("email");
+    const senha = document.getElementById("senha");
+    const emailError = document.getElementById("emailError");
+    const senhaError = document.getElementById("senhaError");
+    const toggleSenha = document.getElementById("toggleSenha");
+    const lembrar = document.getElementById("lembrar");
+    const forgotLink = document.getElementById("forgotLink");
 
-  // Mantém o email salvo
-  const saved = Auth.getSavedEmail();
-  if (saved) email.value = saved;
+    // Email salvo
+    const saved = Auth.getSavedEmail();
+    if (saved) email.value = saved;
 
-  toggleSenha?.addEventListener("click", () => {
-    senha.type = (senha.type === "password") ? "text" : "password";
-  });
+    toggleSenha?.addEventListener("click", () => {
+      senha.type = (senha.type === "password") ? "text" : "password";
+    });
 
-  function clearErrors(){
-    emailError.textContent = "";
-    senhaError.textContent = "";
-  }
+    forgotLink?.addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("DEMO: como os dados ficam no navegador, não dá pra recuperar senha. Crie uma conta nova ou lembre a senha.");
+    });
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    clearErrors();
-
-    const eVal = email.value.trim();
-    const sVal = senha.value.trim();
-
-    if (!eVal) {
-      emailError.textContent = "Digite seu email.";
-      return;
-    }
-    if (!sVal) {
-      senhaError.textContent = "Digite sua senha.";
-      return;
+    function clearErrors(){
+      emailError.textContent = "";
+      senhaError.textContent = "";
     }
 
-    const result = Auth.login(eVal, sVal);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      clearErrors();
 
-    if (!result.ok) {
-      senhaError.textContent = result.message;
-      return;
-    }
+      const eVal = email.value.trim();
+      const sVal = senha.value.trim();
 
-    if (lembrar?.checked) Auth.saveEmail(eVal);
-    else Auth.clearSavedEmail();
+      if (!eVal) { emailError.textContent = "Digite seu email."; return; }
+      if (!sVal) { senhaError.textContent = "Digite sua senha."; return; }
 
-    const backTo = consumeRedirect();
-    window.location.href = backTo || "./usuario.html";
-  });
-</script>
+      const result = Auth.login(eVal, sVal);
+      if (!result.ok) { senhaError.textContent = result.message; return; }
 
-  <!-- MENU INTELIGENTE -->
-  <script type="module" src="/js/menu-auth.js"></script>
+      if (lembrar?.checked) Auth.saveEmail(eVal);
+      else Auth.clearSavedEmail();
 
+      const backTo = consumeRedirect();
+      window.location.href = backTo || "./usuario.html";
+    });
+  </script>
+
+  <!-- MENU + CONTROLE DE ACESSO -->
   <script type="module" src="../js/menu-auth.js"></script>
   <script type="module" src="../js/access.js"></script>
 </body>

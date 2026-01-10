@@ -20,7 +20,6 @@
   </nav>
 </header>
 
-
 <div class="container">
   <h1 id="catTitle">Categoria</h1>
   <div class="grid" id="grid"></div>
@@ -28,7 +27,7 @@
 </div>
 
 <script type="module">
-  import { DevSystem } from "js/dev-system.js";
+  import { DevSystem } from "./js/dev-system.js";
 
   const params = new URLSearchParams(window.location.search);
   const cat = (params.get("cat") || "").toLowerCase();
@@ -36,11 +35,14 @@
   const titleMap = {
     "acao":"Ação","rpg":"RPG","terror":"Terror","aventura":"Aventura","puzzle":"Puzzle","outros":"Outros"
   };
-  const label = titleMap[cat] || "Categoria";
 
+  const label = titleMap[cat] || "Categoria";
   document.getElementById("catTitle").textContent = "Categoria: " + label;
 
-  const games = DevSystem.getPublishedGames().filter(g => (g.category||"").toLowerCase() === label.toLowerCase());
+  const games = DevSystem
+    .getPublishedGames()
+    .filter(g => (g.category || "").toLowerCase() === label.toLowerCase());
+
   const grid = document.getElementById("grid");
 
   if (!games.length) {
@@ -66,4 +68,3 @@
 <script type="module" src="js/access.js"></script>
 </body>
 </html>
-

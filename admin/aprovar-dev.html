@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | Aprovar Devs</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+
+  <style>
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+    .muted{ opacity:.85; font-size: 13px; }
+    .list{ display:grid; gap: 10px; margin-top: 14px; }
+    .item{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .row{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; justify-content: space-between; }
+    .btn{
+      border: none;
+      background: linear-gradient(90deg, #4caf50, #6aa6ff);
+      color: #000;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .btn.danger{
+      background: rgba(255,107,107,.18);
+      color:#fff;
+      border:1px solid rgba(255,107,107,.28);
+    }
+    .field{
+      width: 100%;
+      margin-top: 10px;
+    }
+    .field textarea{
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color:#fff;
+      padding: 10px;
+      border-radius: 10px;
+      outline:none;
+      min-height: 70px;
+      resize: vertical;
+    }
+    .pill{ display:inline-block; font-size: 12px; padding: 3px 8px; border-radius: 999px;
+      background: rgba(106,166,255,.18); border: 1px solid rgba(106,166,255,.30); margin-right: 6px; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>GameHub Indie</h2>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../catalogo.html">Jogos</a>
+      <a href="../sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <div class="wrap container">
+    <h1>Admin — Aprovar Devs</h1>
+    <p class="muted">
+      DEMO: para entrar aqui, o <code>access.js</code> pede o token admin.
+    </p>
+
+    <div style="margin-top:10px;">
+      <a class="btn secondary" href="./aprovar-jogos.html">Ir para Aprovar Jogos</a>
+    </div>
+
+    <div class="list" id="list"></div>
+  </div>
+
+  <footer>© 2026 GameHub Indie</footer>
+
+  <script type="module">
+    import { DevSystem } from "../js/dev-system.js";
+
+    const list = document.getElementById("list");
+
+    function escapeHtml(str){
+      return String(str || "").replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    function render(){
+      const apps = DevSystem.getDevApps().slice().reverse();
+      const pending = apps.filter(a => a.status === "pending");
+
+      if (!pending.length) {
+        list.innerHTML = '<div class="muted">Nenhum pedido pendente.</div>';
+        return;
+      }
+
+      list.innerHTML = pending.map(a => `
+        <div class="item">
+          <div class="row">
+            <div>
+              <div style="font-size:16px; font-weight:bold;">${escapeHtml(a.nick || "Dev")}</div>
+              <div class="muted">${escapeHtml(a.nome || "")} • ${escapeHtml(a.email || "")}</div>
+              <div style="margin-top:6px;">
+                <span class="pill">Tipo: ${escapeHtml(a.tipo || "solo")}</span>
+                ${a.portfolio ? `<span class="pill">Portfólio: <a href="${escapeHtml(a.portfolio)}" target="_blank" rel="noreferrer">abrir</a></span>` : ""}
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn" data-approve="${a.id}">Aprovar</button>
+              <button class="btn danger" data-reject="${a.id}">Recusar</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;" class="muted"><strong>Motivo:</strong> ${escapeHtml(a.motivo || "")}</div>
+
+          <div class="field" id="rejbox_${a.id}" style="display:none;">
+            <div class="muted" style="margin:8px 0 6px;">Motivo da recusa (opcional):</div>
+            <textarea id="rej_${a.id}" placeholder="Ex: portfólio incompleto, descrição muito curta..."></textarea>
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn danger" data-confirm-reject="${a.id}">Confirmar recusa</button>
+              <button class="btn secondary" data-cancel-reject="${a.id}">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    document.addEventListener("click", (e) => {
+      const ap = e.target.closest("[data-approve]");
+      const rj = e.target.closest("[data-reject]");
+      const cr = e.target.closest("[data-confirm-reject]");
+      const cc = e.target.closest("[data-cancel-reject]");
+
+      if (ap) {
+        const id = ap.getAttribute("data-approve");
+        if (confirm("Aprovar este DEV?")) {
+          DevSystem.decideDevApplication(id, "approve");
+          render();
+        }
+      }
+
+      if (rj) {
+        const id = rj.getAttribute("data-reject");
+        const box = document.getElementById("rejbox_" + id);
+        if (box) box.style.display = "block";
+      }
+
+      if (cc) {
+        const id = cc.getAttribute("data-cancel-reject");
+        const box = document.getElementById("rejbox_" + id);
+        if (box) box.style.display = "none";
+      }
+
+      if (cr) {
+        const id = cr.getAttribute("data-confirm-reject");
+        const reason = document.getElementById("rej_" + id)?.value || "";
+        DevSystem.decideDevApplication(id, "reject", reason);
+        render();
+      }
+    });
+
+    render();
+  </script>
+
+  <!-- MENU + CONTROLE DE ACESSO -->
+  <script type="module" src="../js/menu-auth.js"></script>
+  <script type="module" src="../js/access.js"></script>
+</body>
+</html>

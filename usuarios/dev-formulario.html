@@ -146,26 +146,31 @@
 
   <script type="module">
     import { Auth } from "./auth.js";
-    import { DevSystem } from "/js/dev-system.js";
+    import { DevSystem } from "../js/dev-system.js";
 
+    // Proteção: se não estiver logado, volta pro login
     if (!Auth.isLoggedIn()) {
       window.location.href = "./login.html";
+      return;
     }
 
     const user = Auth.getCurrentUser();
     if (!user) {
       Auth.logout();
       window.location.href = "./login.html";
+      return;
     }
 
     // bloqueia se já pendente/aprovado
     if (user.devStatus === "pending") {
       alert("Seu pedido já está em análise.");
       window.location.href = "./usuario.html";
+      return;
     }
     if (user.isDev === true || user.devStatus === "approved") {
       alert("Você já é DEV aprovado.");
       window.location.href = "./usuario.html";
+      return;
     }
 
     // cooldown se rejeitado
@@ -174,6 +179,7 @@
       if (Date.now() < until) {
         alert("Você foi recusado. Tente novamente após 7 dias.");
         window.location.href = "./usuario.html";
+        return;
       }
     }
 

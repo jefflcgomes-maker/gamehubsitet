@@ -1,15 +1,15 @@
 // js/menu-auth.js
 import { Auth } from "../usuarios/auth.js";
 
-// Se estiver dentro de /usuarios/, precisa voltar 1 nível para achar as páginas da raiz
-const prefix = window.location.pathname.includes("/usuarios/") ? "../" : "";
+// Raiz do site a partir deste arquivo (/js/menu-auth.js -> /)
+const SITE = new URL("../", import.meta.url);
 
-// Helper para montar URLs relativas corretas em qualquer página
-function href(path) {
-  return prefix + path;
+function siteUrl(path = "") {
+  const clean = String(path || "").replace(/^\/+/, "");
+  return new URL(clean, SITE).href;
 }
 
-function ensureLink(nav, id, text, linkHref) {
+function ensureLink(nav, id, text, href) {
   let a = nav.querySelector(`#${id}`);
   if (!a) {
     a = document.createElement("a");
@@ -17,7 +17,7 @@ function ensureLink(nav, id, text, linkHref) {
     nav.appendChild(a);
   }
   a.textContent = text;
-  a.href = linkHref;
+  a.href = href;
   return a;
 }
 
@@ -26,26 +26,35 @@ function removeLink(nav, id) {
   if (el) el.remove();
 }
 
+// Remove links antigos/legados de "devs" do menu, se existirem
+function removeDevLinks(nav) {
+  const links = Array.from(nav.querySelectorAll("a"));
+  links.forEach((a) => {
+    const href = (a.getAttribute("href") || "").toLowerCase();
+    const text = (a.textContent || "").toLowerCase();
+
+    // não remove "Minha Conta"
+    if ((a.id || "").toLowerCase() === "accountlink") return;
+
+    // ✅ cobre: devs.html, /dev/, dev/, qualquer texto "dev"
+    if (href.includes("devs") || href.includes("/dev/") || href.includes("dev/") || text.includes("dev")) {
+      a.remove();
+    }
+  });
+}
+
 function runMenuAuth() {
   const nav = document.querySelector("header nav");
   if (!nav) return;
 
-  // 1) Corrige SEMPRE os links base do menu (Home/Jogos/Sobre)
-  const linkHome = nav.querySelector("#linkHome");
-  const linkCatalogo = nav.querySelector("#linkCatalogo");
-  const linkSobre = nav.querySelector("#linkSobre");
+  removeDevLinks(nav);
 
-  if (linkHome) linkHome.href = href("index.html");
-  if (linkCatalogo) linkCatalogo.href = href("catalogo.html");
-  if (linkSobre) linkSobre.href = href("sobre.html");
-
-  // 2) Controla área de autenticação
   const logged = Auth.isLoggedIn();
 
   if (!logged) {
-    // Deslogado: Entrar + Cadastro
-    ensureLink(nav, "authLink", "Entrar", href("usuarios/login.html"));
-    ensureLink(nav, "cadastroLink", "Cadastro", href("usuarios/cadastro.html"));
+    // Não logado: Entrar + Cadastro
+    ensureLink(nav, "authLink", "Entrar", siteUrl("usuarios/login.html"));
+    ensureLink(nav, "cadastroLink", "Cadastro", siteUrl("usuarios/cadastro.html"));
 
     removeLink(nav, "accountLink");
     removeLink(nav, "logoutLink");
@@ -56,25 +65,29 @@ function runMenuAuth() {
   removeLink(nav, "authLink");
   removeLink(nav, "cadastroLink");
 
-  ensureLink(nav, "accountLink", "Minha Conta", href("/usuarios/usuario.html"));
+  ensureLink(nav, "accountLink", "Minha Conta", siteUrl("usuarios/usuario.html"));
 
   const logout = ensureLink(nav, "logoutLink", "Sair", "#");
   logout.onclick = (e) => {
     e.preventDefault();
     Auth.logout();
-    window.location.href = href("index.html");
+    window.location.href = siteUrl("usuarios/login.html");
   };
 }
 
 // Redireciona login/cadastro se já estiver logado (opcional)
 (function redirectIfLoggedOnAuthPages() {
-  const path = window.location.pathname;
+  const path = (window.location.pathname || "").toLowerCase();
+
+  // ✅ funciona com /usuarios/login.html e também com usuarios/login.html
   const isAuthPage =
     path.endsWith("/usuarios/login.html") ||
-    path.endsWith("/usuarios/cadastro.html");
+    path.endsWith("usuarios/login.html") ||
+    path.endsWith("/usuarios/cadastro.html") ||
+    path.endsWith("usuarios/cadastro.html");
 
   if (isAuthPage && Auth.isLoggedIn()) {
-    window.location.href = href("/usuarios/usuario.html");
+    window.location.href = siteUrl("usuarios/usuario.html");
   }
 })();
 

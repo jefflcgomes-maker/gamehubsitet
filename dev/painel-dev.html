@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Dev | GameHub Indie</title>
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+
+  <style>
+    .panel-wrap{ max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+    .row{ display:flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+    .box{
+      flex: 1;
+      min-width: 290px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .box h2{ font-size: 18px; margin-bottom: 10px; }
+    .muted{ opacity:.85; font-size: 13px; }
+    .field{ display:block; margin: 10px 0; }
+    .field span{ display:block; font-size: 12px; opacity:.85; margin-bottom: 6px; }
+    .field input, .field textarea, .field select{
+      width:100%;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color:#fff;
+      padding: 10px 10px;
+      border-radius: 10px;
+      outline:none;
+    }
+    .field textarea{ min-height: 90px; resize: vertical; }
+    .btn{
+      border: none;
+      background: linear-gradient(90deg, #4caf50, #6aa6ff);
+      color: #000;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .list{
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .item{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .item h3{ font-size: 16px; margin-bottom: 4px; }
+    .tag{
+      display:inline-block;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(106,166,255,.18);
+      border: 1px solid rgba(106,166,255,.30);
+      margin-right: 6px;
+    }
+    .status-pending{ background: rgba(255,193,7,.15); border-color: rgba(255,193,7,.25); }
+    .status-approved{ background: rgba(76,175,80,.14); border-color: rgba(76,175,80,.25); }
+    .status-rejected{ background: rgba(255,107,107,.14); border-color: rgba(255,107,107,.25); }
+    .err{ color:#ff6b6b; font-size: 13px; min-height: 18px; margin-top: 6px; }
+    .ok{ color:#6be870; font-size: 13px; min-height: 18px; margin-top: 6px; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h2>GameHub Indie</h2>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../catalogo.html">Jogos</a>
+      <a href="../sobre.html">Sobre</a>
+    </nav>
+  </header>
+
+  <div class="panel-wrap container">
+    <h1>Painel do Dev</h1>
+    <p class="muted">Aqui você envia jogos para aprovação do admin. (DEMO: tudo no localStorage)</p>
+
+    <div class="row" style="margin-top:14px;">
+      <section class="box">
+        <h2>Enviar jogo</h2>
+
+        <form id="gameForm" novalidate>
+          <label class="field">
+            <span>Título</span>
+            <input id="title" type="text" placeholder="Nome do jogo" />
+          </label>
+
+          <label class="field">
+            <span>Categoria</span>
+            <select id="category">
+              <option value="">Selecione...</option>
+              <option value="Ação">Ação</option>
+              <option value="RPG">RPG</option>
+              <option value="Terror">Terror</option>
+              <option value="Aventura">Aventura</option>
+              <option value="Puzzle">Puzzle</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Descrição</span>
+            <textarea id="description" placeholder="Descreva seu jogo (mín. 10 caracteres)"></textarea>
+          </label>
+
+          <label class="field">
+            <span>Link de download (Drive/Itch/GitHub Releases...)</span>
+            <input id="downloadUrl" type="url" placeholder="https://..." />
+          </label>
+
+          <label class="field">
+            <span>Link da capa (opcional)</span>
+            <input id="coverUrl" type="url" placeholder="https://... (ou deixe vazio)" />
+          </label>
+
+          <label class="field">
+            <span>Tags (opcional)</span>
+            <input id="tags" type="text" placeholder="ex: pixelart, roguelike, survival" />
+          </label>
+
+          <button class="btn" type="submit">Enviar para aprovação</button>
+          <a class="btn secondary" href="../usuarios/usuario.html" style="margin-left:8px;">Voltar ao perfil</a>
+
+          <div class="err" id="err"></div>
+          <div class="ok" id="ok"></div>
+        </form>
+      </section>
+
+      <section class="box">
+        <h2>Meus envios</h2>
+        <div class="muted">Acompanhe o status do que você enviou.</div>
+        <div class="list" id="myList"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>© 2026 GameHub Indie</footer>
+
+  <script type="module">
+    import { Auth } from "../usuarios/auth.js";
+    import { DevSystem } from "../js/dev-system.js";
+
+    const form = document.getElementById("gameForm");
+    const err = document.getElementById("err");
+    const ok = document.getElementById("ok");
+
+    function setErr(msg){ err.textContent = msg || ""; }
+    function setOk(msg){ ok.textContent = msg || ""; }
+
+    function renderMySubmissions() {
+      const user = Auth.getCurrentUser();
+      const wrap = document.getElementById("myList");
+      if (!wrap) return;
+
+      const subs = DevSystem.getSubmissionsByUser(user.id).slice().reverse();
+
+      if (!subs.length) {
+        wrap.innerHTML = '<div class="muted">Você ainda não enviou jogos.</div>';
+        return;
+      }
+
+      wrap.innerHTML = subs.map(s => {
+        const st = s.status || "pending";
+        const cls =
+          st === "approved" ? "status-approved" :
+          st === "rejected" ? "status-rejected" : "status-pending";
+
+        const stLabel =
+          st === "approved" ? "Aprovado ✅" :
+          st === "rejected" ? "Recusado ❌" : "Em análise ⏳";
+
+        const reason = (st === "rejected" && s.rejectReason) ? `<div class="muted">Motivo: ${s.rejectReason}</div>` : "";
+
+        return `
+          <div class="item ${cls}">
+            <h3>${s.title}</h3>
+            <div style="margin:6px 0;">
+              <span class="tag">${stLabel}</span>
+              ${s.category ? `<span class="tag">${s.category}</span>` : ""}
+            </div>
+            <div class="muted">${(s.description || "").slice(0,140)}${(s.description||"").length>140?"…":""}</div>
+            ${reason}
+            ${s.downloadUrl ? `<div style="margin-top:8px;"><a class="btn secondary" href="${s.downloadUrl}" target="_blank" rel="noreferrer">Abrir download</a></div>` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Proteção extra: só DEV aprovado pode usar
+    const u = Auth.getCurrentUser();
+    if (!Auth.isLoggedIn() || !u) {
+      window.location.href = "../usuarios/login.html";
+    }
+    if (!(u.isDev || u.devStatus === "approved")) {
+      alert("Acesso somente para DEV aprovado.");
+      window.location.href = "../usuarios/usuario.html";
+    }
+
+    renderMySubmissions();
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      setErr(""); setOk("");
+
+      const payload = {
+        title: document.getElementById("title").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        downloadUrl: document.getElementById("downloadUrl").value.trim(),
+        coverUrl: document.getElementById("coverUrl").value.trim(),
+        tags: document.getElementById("tags").value.trim(),
+      };
+
+      const res = DevSystem.submitGame(payload);
+      if (!res.ok) {
+        setErr(res.message || "Falha ao enviar.");
+        return;
+      }
+
+      setOk("Enviado! Agora aguarde aprovação do administrador.");
+      form.reset();
+      renderMySubmissions();
+    });
+  </script>
+
+  <!-- MENU + CONTROLE DE ACESSO -->
+  <script type="module" src="../js/menu-auth.js"></script>
+  <script type="module" src="../js/access.js"></script>
+</body>
+</html>
