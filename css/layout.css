@@ -13,10 +13,10 @@ header {
 }
 
 /* Barra do menu sempre no topo */
-.menu-strip {
-  position: sticky;
-  top: 0;
-  z-index: 9999;
+.menu-strip{
+  background: rgba(20,20,20,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* =========================================================

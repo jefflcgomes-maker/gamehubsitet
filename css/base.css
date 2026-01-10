@@ -18,3 +18,12 @@ body {
   line-height: 1.0;
     font-size: 25px; /* ← muda o tamanho do texto */
 }
+
+/* =========================================================
+   3) AJUSTE DA BARRA SUPERIOS)
+========================================================= */
+
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
