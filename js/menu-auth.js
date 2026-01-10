@@ -2,11 +2,15 @@
 import { Auth } from "../usuarios/auth.js"; // ✅ correto (relativo ao arquivo js/)
 
 function getBasePath() {
-  // ✅ Funciona em GitHub Pages (project site) e em localhost
-  // Ex: /gamehubsitet/index.html -> base = /gamehubsitet/
-  // Ex: /index.html -> base = /
   const parts = window.location.pathname.split("/").filter(Boolean);
-  return parts.length >= 2 ? `/${parts[0]}/` : "/";
+
+  // GitHub Pages (project site): /NOME-DO-REPO/...
+  if (window.location.hostname.endsWith("github.io")) {
+    return parts.length ? `/${parts[0]}/` : "/";
+  }
+
+  // Outros hosts normalmente publicam na raiz do domínio
+  return "/";
 }
 
 const BASE = getBasePath();
