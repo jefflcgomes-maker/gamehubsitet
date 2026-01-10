@@ -1,5 +1,19 @@
 // js/menu-auth.js
-import { Auth } from "/usuarios/auth.js";
+import { Auth } from "../usuarios/auth.js"; // ✅ correto (relativo ao arquivo js/)
+
+function getBasePath() {
+  // ✅ Funciona em GitHub Pages (project site) e em localhost
+  // Ex: /gamehubsitet/index.html -> base = /gamehubsitet/
+  // Ex: /index.html -> base = /
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  return parts.length >= 2 ? `/${parts[0]}/` : "/";
+}
+
+const BASE = getBasePath();
+
+function url(path) {
+  return BASE + path.replace(/^\/+/, "");
+}
 
 function ensureLink(nav, id, text, href) {
   let a = nav.querySelector(`#${id}`);
@@ -19,16 +33,12 @@ function removeLink(nav, id) {
 }
 
 function removeDevLinks(nav) {
-  // Remove/hide qualquer link "Para Devs" que ainda exista em páginas antigas
   const links = Array.from(nav.querySelectorAll("a"));
   links.forEach(a => {
     const href = (a.getAttribute("href") || "").toLowerCase();
     const text = (a.textContent || "").toLowerCase();
     if (href.includes("dev") || text.includes("dev")) {
-      // Mantém "Minha Conta" se existir
       if ((a.id || "").toLowerCase() === "accountlink") return;
-      // Mantém caso seja a home/jogos/sobre (não contém dev)
-      // Remove qualquer coisa relacionada a dev
       if (href.includes("devs") || href.includes("/dev/") || text.includes("dev")) {
         a.remove();
       }
@@ -45,22 +55,26 @@ function runMenuAuth() {
   const logged = Auth.isLoggedIn();
 
   if (!logged) {
-    // Não logado: mostra "Entrar"
-    ensureLink(nav, "authLink", "Entrar", "/usuarios/login.html");
+    // ✅ Não logado: mostra Entrar + Cadastro
+    ensureLink(nav, "authLink", "Entrar", url("usuarios/login.html"));
+    ensureLink(nav, "cadastroLink", "Cadastro", url("usuarios/cadastro.html"));
+
     removeLink(nav, "accountLink");
     removeLink(nav, "logoutLink");
     return;
   }
 
-  // Logado: mostra "Minha Conta" + "Sair"
+  // ✅ Logado: mostra Minha Conta + Sair
   removeLink(nav, "authLink");
-  ensureLink(nav, "accountLink", "Minha Conta", "/usuarios/usuario.html");
+  removeLink(nav, "cadastroLink");
+
+  ensureLink(nav, "accountLink", "Minha Conta", url("usuarios/usuario.html"));
 
   const logout = ensureLink(nav, "logoutLink", "Sair", "#");
   logout.onclick = (e) => {
     e.preventDefault();
     Auth.logout();
-    window.location.href = "/usuarios/login.html";
+    window.location.href = url("usuarios/login.html");
   };
 }
 
@@ -72,7 +86,7 @@ function runMenuAuth() {
     path.endsWith("/usuarios/cadastro.html");
 
   if (isAuthPage && Auth.isLoggedIn()) {
-    window.location.href = "/usuarios/usuario.html";
+    window.location.href = url("usuarios/usuario.html");
   }
 })();
 
