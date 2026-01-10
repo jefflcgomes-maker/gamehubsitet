@@ -56,7 +56,7 @@ function runMenuAuth() {
   removeLink(nav, "authLink");
   removeLink(nav, "cadastroLink");
 
-  ensureLink(nav, "accountLink", "Minha Conta", href("../usuarios/usuario.html"));
+  ensureLink(nav, "accountLink", "Minha Conta", href("/usuarios/usuario.html"));
 
   const logout = ensureLink(nav, "logoutLink", "Sair", "#");
   logout.onclick = (e) => {
@@ -74,7 +74,7 @@ function runMenuAuth() {
     path.endsWith("/usuarios/cadastro.html");
 
   if (isAuthPage && Auth.isLoggedIn()) {
-    window.location.href = href("../usuarios/usuario.html");
+    window.location.href = href("/usuarios/usuario.html");
   }
 })();
 
