@@ -1,5 +1,5 @@
 // js/dev-system.js
-import { Auth } from "/usuarios/auth.js";
+import { Auth } from "/..usuarios/auth.js";
 
 const DEV_APPS_KEY = "gh_dev_apps_v1";
 const GAME_SUBS_KEY = "gh_game_submissions_v1";
