@@ -11,61 +11,71 @@
 </head>
 
 <body>
-<header>
-  <h2>GameHub Indie</h2>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="catalogo.html">Jogos</a>
-    <a href="sobre.html">Sobre</a>
-  </nav>
-</header>
 
-<div class="container">
-  <h1>Catálogo de Jogos</h1>
-
-  <div class="categorias">
-    <a href="categoria.html?cat=acao">Ação</a>
-    <a href="categoria.html?cat=rpg">RPG</a>
-    <a href="categoria.html?cat=terror">Terror</a>
-    <a href="categoria.html?cat=aventura">Aventura</a>
-    <a href="categoria.html?cat=puzzle">Puzzle</a>
+  <!-- BARRA / MENU (igual ao print) -->
+  <div class="menu-strip gh-menu">
+    <nav class="menu-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogo.html">Jogos</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="usuarios/login.html">Entrar</a>
+      <a href="usuarios/cadastro.html">Cadastro</a>
+    </nav>
   </div>
 
-  <h2 style="margin-top:18px;">Jogos aprovados (DEMO)</h2>
-  <div class="grid" id="publishedGrid"></div>
-  <p id="noPublished" style="opacity:.85; display:none;">Ainda não há jogos publicados.</p>
+  <header>
+    <h2>GameHub Indie</h2>
+    <!-- Se quiser, REMOVA este nav antigo para não duplicar -->
+    <!-- <nav> ... </nav> -->
+  </header>
 
-  <p style="opacity:.85; margin-top:16px;">
-    Quer publicar? Vá em <a href="./usuarios/usuario.html" data-auth="required">Minha Conta</a> e solicite para virar DEV.
-  </p>
-</div>
+  <div class="container">
+    <h1>Catálogo de Jogos</h1>
 
-<script type="module">
-  import { DevSystem } from "./js/dev-system.js";
+    <div class="categorias">
+      <a href="categoria.html?cat=acao">Ação</a>
+      <a href="categoria.html?cat=rpg">RPG</a>
+      <a href="categoria.html?cat=terror">Terror</a>
+      <a href="categoria.html?cat=aventura">Aventura</a>
+      <a href="categoria.html?cat=puzzle">Puzzle</a>
+    </div>
 
-  const grid = document.getElementById("publishedGrid");
-  const games = DevSystem.getPublishedGames().slice().reverse();
+    <h2 style="margin-top:18px;">Jogos aprovados (DEMO)</h2>
+    <div class="grid" id="publishedGrid"></div>
+    <p id="noPublished" style="opacity:.85; display:none;">Ainda não há jogos publicados.</p>
 
-  if (!games.length) {
-    document.getElementById("noPublished").style.display = "block";
-  } else {
-    grid.innerHTML = games.map(g => `
-      <div class="card">
-        <img src="${g.coverUrl || 'assets/img/jogo1.jpg'}" alt="Capa do jogo">
-        <div class="card-content">
-          <h3>${g.title}</h3>
-          <p class="categoria">${(g.category||'Indie')} • por ${g.devNick || 'Dev'}</p>
-          <a href="${g.downloadUrl}" target="_blank" rel="noreferrer" class="btn">Ver / Baixar</a>
+    <p style="opacity:.85; margin-top:16px;">
+      Quer publicar? Vá em <a href="usuarios/usuario.html" data-auth="required">Minha Conta</a> e solicite para virar DEV.
+    </p>
+  </div>
+
+  <script type="module">
+    import { DevSystem } from "./js/dev-system.js";
+
+    const grid = document.getElementById("publishedGrid");
+    const games = DevSystem.getPublishedGames().slice().reverse();
+
+    if (!games.length) {
+      document.getElementById("noPublished").style.display = "block";
+    } else {
+      grid.innerHTML = games.map(g => `
+        <div class="card">
+          <img src="${g.coverUrl || 'assets/img/jogo1.jpg'}" alt="Capa do jogo">
+          <div class="card-content">
+            <h3>${g.title}</h3>
+            <p class="categoria">${(g.category||'Indie')} • por ${g.devNick || 'Dev'}</p>
+            <a href="${g.downloadUrl}" target="_blank" rel="noreferrer" class="btn">Ver / Baixar</a>
+          </div>
         </div>
-      </div>
-    `).join("");
-  }
-</script>
+      `).join("");
+    }
+  </script>
 
-<footer>© 2026 GameHub Indie</footer>
+  <footer>© 2026 GameHub Indie</footer>
 
-<!-- MENU + CONTROLE DE ACESSO -->
-<script type="module" src="js/menu-auth.js"></script>
-<script type="module" src="js/access.js"></script>
+  <!-- MENU + CONTROLE DE ACESSO -->
+  <script type="module" src="js/menu-auth.js"></script>
+  <script type="module" src="js/access.js"></script>
+
 </body>
 </html>
